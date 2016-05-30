@@ -8,11 +8,12 @@ export default class {
   /**
    * constructor
    */
-  constructor(file, options = {}, config, cluster){
+  constructor(file, opts = {}){
     this.file = file;
-    this.options = options;
-    this.config = config;
-    this.cluster = cluster;
+    this.options = opts.options || {};
+    this.config = opts.config;
+    this.cluster = opts.cluster;
+    this.fileManage = opts.fileManage;
   }
   /**
    * get file content
@@ -74,10 +75,12 @@ export default class {
   }
   /**
    * async content replace
+   * must be use RegExp
    */
   replace(content = '', replace, callback){
     return asyncReplace(content, replace, callback);
   }
+  
   /**
    * run
    */
