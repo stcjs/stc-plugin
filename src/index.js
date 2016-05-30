@@ -1,5 +1,6 @@
 import {asyncReplace} from 'stc-helper';
 import {isMaster} from 'cluster';
+import InvokePlugin from 'stc-plugin-invoke';
 
 /**
  * stc plugin abstract class
@@ -14,6 +15,7 @@ export default class {
     this.config = opts.config;
     this.cluster = opts.cluster;
     this.fileManage = opts.fileManage;
+    this.extConf = opts.extConf;
   }
   /**
    * get file content
@@ -72,6 +74,31 @@ export default class {
     }
     this.file.setAst(ast);
     return this;
+  }
+  /**
+   * add file dependence
+   */
+  addDependence(dependencies){
+    
+  }
+  /**
+   * add file
+   */
+  addFile(filePath){
+    
+  }
+  /**
+   * invoke plugin
+   */
+  invokePlugin(plugin, file){
+    let instance = new InvokePlugin(olugin, file, {
+      config: this.config,
+      options: this.options,
+      fileManage: this.fileManage,
+      cluster: this.cluster,
+      extConf: this.extConf
+    });
+    return instance.run();
   }
   /**
    * async content replace
