@@ -49,10 +49,11 @@ export default class {
       if(this.file.hasAst()){
         return this.file.getAst();
       }
+      let content = await this.getContent('utf8');
       //get ast in worker parsed
       let ret = await this.cluster.doTask({
         type: 'getAst',
-        content: this.getContent('utf8'),
+        content,
         file: this.file.path
       });
       this.file.setAst(ret);
