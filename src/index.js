@@ -5,7 +5,7 @@ import InvokePlugin from 'stc-plugin-invoke';
 /**
  * stc plugin abstract class
  */
-export default class {
+export default class StcPlugin {
   /**
    * constructor
    */
