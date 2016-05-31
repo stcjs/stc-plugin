@@ -79,13 +79,17 @@ export default class {
    * add file dependence
    */
   addDependence(dependencies){
-    
+    if(!isMaster){
+      throw new Error('addDependence must be invoked in master');
+    }
   }
   /**
    * add file
    */
   addFile(filePath){
-    
+    if(!isMaster){
+      throw new Error('addFile must be invoked in master');
+    }
   }
   /**
    * invoke plugin
@@ -104,7 +108,7 @@ export default class {
    * async content replace
    * must be use RegExp
    */
-  replace(content = '', replace, callback){
+  asyncReplace(content = '', replace, callback){
     return asyncReplace(content, replace, callback);
   }
   
