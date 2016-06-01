@@ -15,7 +15,8 @@ export default class StcPlugin {
     this.config = opts.config;
     this.cluster = opts.cluster;
     this.fileManage = opts.fileManage;
-    this.extConf = opts.extConf;
+    //can not use extConf in sub plugins
+    this.extConf = opts.extConf || {};
   }
   /**
    * get file content
@@ -45,6 +46,11 @@ export default class StcPlugin {
    * get file ast
    */
   async getAst(){
+    //force in master invoked
+    if(this.extConf.forceInMaster){
+      return this.file.getAst();
+    }
+    
     if(isMaster){
       if(this.file.hasAst()){
         return this.file.getAst();
