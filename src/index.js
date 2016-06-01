@@ -1,6 +1,7 @@
-import {asyncReplace} from 'stc-helper';
+import {asyncReplace, isArray, isString} from 'stc-helper';
 import {isMaster} from 'cluster';
 import InvokePlugin from 'stc-plugin-invoke';
+import path from 'path';
 
 /**
  * stc plugin abstract class
@@ -70,7 +71,7 @@ export default class StcPlugin {
       method: 'getAst',
       file: this.file.path,
       options: this.options
-    })
+    });
   }
   /**
    * set ast
@@ -89,6 +90,23 @@ export default class StcPlugin {
     if(!isMaster){
       throw new Error('addDependence must be invoked in master');
     }
+    if(!isArray(dependencies)){
+      dependencies = [dependencies];
+    }
+    let currentFilePath = path.dirname(this.file.path);
+    dependencies = dependencies.map(item => {
+      if(!isString(item)){
+        return item;
+      }
+      let filepath = path.resolve(currentFilePath, item);
+      let file = this.fileManage.getFileByPath(filepath);
+      if(!file){
+        throw new Error(`file ${item} is not exist in ${this.file.path}`);
+      }
+      return file;
+    });
+    this.file.dependence.add(dependencies);
+    return this;
   }
   /**
    * add file
@@ -102,7 +120,7 @@ export default class StcPlugin {
    * invoke plugin
    */
   invokePlugin(plugin, file){
-    let instance = new InvokePlugin(olugin, file, {
+    let instance = new InvokePlugin(plugin, file, {
       config: this.config,
       options: this.options,
       fileManage: this.fileManage,
