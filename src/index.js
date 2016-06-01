@@ -93,12 +93,11 @@ export default class StcPlugin {
     if(!isArray(dependencies)){
       dependencies = [dependencies];
     }
-    let currentFilePath = path.dirname(this.file.path);
     dependencies = dependencies.map(item => {
       if(!isString(item)){
         return item;
       }
-      let filepath = path.resolve(currentFilePath, item);
+      let filepath = this.getResolvePath(item);
       let file = this.fileManage.getFileByPath(filepath);
       if(!file){
         throw new Error(`file ${item} is not exist in ${this.file.path}`);
@@ -111,10 +110,24 @@ export default class StcPlugin {
   /**
    * add file
    */
-  addFile(filePath){
+  addFile(filepath, content){
     if(!isMaster){
       throw new Error('addFile must be invoked in master');
     }
+    let resolvePath = this.getResolvePath(filepath);
+    return this.fileManage.addFile(resolvePath, content);
+  }
+  /**
+   * get resolve path
+   */
+  getResolvePath(filepath){
+    let currentFilePath = path.dirname(this.file.path);
+    let resolvePath = path.resolve(currentFilePath, filepath);
+    let currentPath = process.cwd() + path.sep;
+    if(resolvePath.indexOf(currentPath) === 0){
+      resolvePath = resolvePath.slice(currentPath.length);
+    }
+    return resolvePath;
   }
   /**
    * invoke plugin
