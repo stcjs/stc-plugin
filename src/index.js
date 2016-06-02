@@ -47,7 +47,8 @@ export default class StcPlugin {
   async getAst(){
     
     if(isMaster){
-      if(this.file.hasAst()){
+      let clusterOpt = this.stc.config.common.cluster;
+      if(this.file.hasAst() || clusterOpt === false){
         return this.file.getAst();
       }
       let content = await this.getContent('utf8');
@@ -60,6 +61,7 @@ export default class StcPlugin {
       this.file.setAst(ret);
       return ret;
     }
+    
     //get ast from master
     return this.stc.cluster.invoke({
       method: 'getAst',
