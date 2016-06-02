@@ -1,8 +1,7 @@
 import {asyncReplace, isArray, isString} from 'stc-helper';
 import {isMaster} from 'cluster';
-import InvokePlugin from 'stc-plugin-invoke';
+import PluginInvoke from 'stc-plugin-invoke';
 import path from 'path';
-
 /**
  * stc plugin abstract class
  */
@@ -13,11 +12,10 @@ export default class StcPlugin {
   constructor(file, opts = {}){
     this.file = file;
     this.options = opts.options || {};
-    this.config = opts.config;
-    this.cluster = opts.cluster;
-    this.fileManage = opts.fileManage;
-    //can not use extConf in sub plugins
-    this.extConf = opts.extConf || {};
+    this.stc = opts.stc;
+    this.TokenType = this.stc.TokenType;
+    //can not use ext in sub plugins
+    this.ext = opts.ext || {};
   }
   /**
    * get file content
@@ -26,7 +24,7 @@ export default class StcPlugin {
     if(isMaster){
       return this.file.getContent(encoding);
     }
-    return this.cluster.invoke({
+    return this.stc.cluster.invoke({
       method: 'getContent',
       args: [encoding],
       file: this.file.path,
@@ -47,10 +45,6 @@ export default class StcPlugin {
    * get file ast
    */
   async getAst(){
-    //force in master invoked
-    if(this.extConf.forceInMaster){
-      return this.file.getAst();
-    }
     
     if(isMaster){
       if(this.file.hasAst()){
@@ -58,7 +52,7 @@ export default class StcPlugin {
       }
       let content = await this.getContent('utf8');
       //get ast in worker parsed
-      let ret = await this.cluster.doTask({
+      let ret = await this.stc.cluster.doTask({
         type: 'getAst',
         content,
         file: this.file.path
@@ -67,7 +61,7 @@ export default class StcPlugin {
       return ret;
     }
     //get ast from master
-    return this.cluster.invoke({
+    return this.stc.cluster.invoke({
       method: 'getAst',
       file: this.file.path,
       options: this.options
@@ -98,7 +92,7 @@ export default class StcPlugin {
         return item;
       }
       let filepath = this.getResolvePath(item);
-      let file = this.fileManage.getFileByPath(filepath);
+      let file = this.stc.resource.getFileByPath(filepath);
       if(!file){
         throw new Error(`file ${item} is not exist in ${this.file.path}`);
       }
@@ -115,7 +109,7 @@ export default class StcPlugin {
       throw new Error('addFile must be invoked in master');
     }
     let resolvePath = this.getResolvePath(filepath);
-    return this.fileManage.addFile(resolvePath, content);
+    return this.stc.resource.addFile(resolvePath, content);
   }
   /**
    * get resolve path
@@ -133,12 +127,10 @@ export default class StcPlugin {
    * invoke plugin
    */
   invokePlugin(plugin, file){
-    let instance = new InvokePlugin(plugin, file, {
-      config: this.config,
+    let instance = new PluginInvoke(plugin, file, {
+      stc: this.stc,
       options: this.options,
-      fileManage: this.fileManage,
-      cluster: this.cluster,
-      extConf: this.extConf
+      ext: this.ext
     });
     return instance.run();
   }
