@@ -94,7 +94,7 @@ export default class StcPlugin {
         return item;
       }
       let filepath = this.getResolvePath(item);
-      let file = this.stc.resource.getFileByPath(filepath);
+      let file = this.lookFile(filepath);
       if(!file){
         throw new Error(`file ${item} is not exist in ${this.file.path}`);
       }
@@ -113,6 +113,7 @@ export default class StcPlugin {
     let resolvePath = this.getResolvePath(filepath);
     return this.stc.resource.addFile(resolvePath, content);
   }
+  
   /**
    * get resolve path
    */
@@ -125,6 +126,14 @@ export default class StcPlugin {
     }
     return resolvePath;
   }
+  
+  /**
+   * invoke self plugin
+   */
+  invokeSelf(file){
+    return this.invokePlugin(this.constructor, file);
+  }
+  
   /**
    * invoke plugin
    */
@@ -136,6 +145,7 @@ export default class StcPlugin {
     });
     return instance.run();
   }
+  
   /**
    * async content replace
    * must be use RegExp
