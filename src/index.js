@@ -47,7 +47,7 @@ export default class StcPlugin {
   async getAst(){
     
     if(isMaster){
-      let clusterOpt = this.stc.config.common.cluster;
+      let clusterOpt = this.stc.config.cluster;
       if(this.file.hasAst() || clusterOpt === false){
         return this.file.getAst();
       }
@@ -94,7 +94,7 @@ export default class StcPlugin {
         return item;
       }
       let filepath = this.getResolvePath(item);
-      let file = this.lookFile(filepath);
+      let file = this.stc.resource.lookFile(filepath, this.file.path);
       if(!file){
         throw new Error(`file ${item} is not exist in ${this.file.path}`);
       }
