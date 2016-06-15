@@ -101,7 +101,7 @@ export default class StcPlugin {
       return file;
     });
     this.file.dependence.add(dependencies);
-    return this;
+    return dependencies;
   }
   /**
    * add file
