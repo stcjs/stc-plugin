@@ -136,14 +136,14 @@ export default class StcPlugin {
   /**
    * invoke self plugin
    */
-  invokeSelf(file){
+  invokeSelf(file = this.file){
     return this.invokePlugin(this.constructor, file);
   }
   
   /**
    * invoke plugin
    */
-  invokePlugin(plugin, file){
+  invokePlugin(plugin, file = this.file){
     let instance = new PluginInvoke(plugin, file, {
       stc: this.stc,
       options: this.options,
