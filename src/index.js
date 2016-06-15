@@ -104,6 +104,12 @@ export default class StcPlugin {
     return dependencies;
   }
   /**
+   * get file dependence
+   */
+  getDependence(file = this.file){
+    return file.dependence.get();
+  }
+  /**
    * add file
    */
   addFile(filepath, content){
