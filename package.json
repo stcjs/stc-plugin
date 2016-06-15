@@ -21,7 +21,8 @@
   }],
   "main": "lib/index.js",
   "dependencies": {
-    "stc-helper": "stcjs/stc-helper"
+    "stc-helper": "1.x.x",
+    "stc-plugin-invoke": "1.x.x"
   },
   "devDependencies": {
     "ava": "^0.14.0",
