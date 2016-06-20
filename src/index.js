@@ -159,6 +159,57 @@ export default class StcPlugin {
   asyncReplace(content = '', replace, callback){
     return asyncReplace(content, replace, callback);
   }
+
+  /**
+   * throw fatal error
+   */
+  fatal(message, line, column, file = this.file.path){
+    let error = new Error(message);
+    error.className = this.constructor.name;
+    error.file = file;
+    error.line = line;
+    error.column = column;
+    throw error;
+  }
+
+  /**
+   * show error log
+   */
+  error(message, line, column, file = this.file.path){
+    this.stc.log.error({
+      message,
+      line,
+      column,
+      file,
+      className: this.constructor.name
+    });
+  }
+
+   /**
+   * show warning log
+   */
+  warning(message, line, column, file = this.file.path){
+    this.stc.log.warning({
+      message,
+      line,
+      column,
+      file,
+      className: this.constructor.name
+    });
+  }
+
+   /**
+   * show notice log
+   */
+  notice(message, line, column, file = this.file.path){
+    this.stc.log.notice({
+      message,
+      line,
+      column,
+      file,
+      className: this.constructor.name
+    });
+  }
   
   /**
    * run
