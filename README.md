@@ -6,7 +6,7 @@ Abstract plugin class for stc
 
 ### file
 
-文件对象，文件包含的属性核方法见 [stc-file](https://github.com/stcjs/stc-file)。
+文件对象，文件包含的属性和方法见 [stc-file](https://github.com/stcjs/stc-file)。
 
 ### options
 
