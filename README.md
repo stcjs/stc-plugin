@@ -18,7 +18,7 @@ stc 对象。
 
 ### TokenType
 
-HTML 和 CSS 的 Token 类型，具体见 <https://github.com/welefen/flkit>。
+HTML 和 CSS 的 Token 类型，具体见 <https://github.com/welefen/flkit#tokentype>。
 
 ### ext
 
