@@ -137,8 +137,11 @@ export default class StcPlugin {
    */
   getFileByPath(filepath){
     filepath = this.getResolvePath(filepath);
+    if(filepath[0] === '/'){
+      filepath = filepath.slice(1);
+    }
     if(isMaster){
-      let file = this.stc.resource.getFileByPath(filepath);
+      let file = this.stc.resource.getFileByPath(filepath, this.file.path);
       return Promise.resolve(file);
     }
     return this.stc.getFileInWorker(filepath);
