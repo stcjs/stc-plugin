@@ -58,6 +58,10 @@ HTML 和 CSS 的 Token 类型，具体见 <https://github.com/welefen/flkit#toke
 
 添加一个文件到资源池中，如：多张小图片合并成一张大图片，需要将大图片添加到资源池中。
 
+### getFileByPath(filepath)
+
+通过路径获取 stc-file 对象。
+
 ### invokeSelf(file)
 
 对另一个文件执行当前插件。
