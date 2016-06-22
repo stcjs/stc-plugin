@@ -132,18 +132,35 @@ export default class StcPlugin {
     }
     return resolvePath;
   }
+  /**
+   * get file by path
+   */
+  getFileByPath(filepath){
+    filepath = this.getResolvePath(filepath);
+    if(isMaster){
+      let file = this.stc.resource.getFileByPath(filepath);
+      return Promise.resolve(file);
+    }
+    return this.stc.getFileInWorker(filepath);
+  }
   
   /**
    * invoke self plugin
    */
-  invokeSelf(file = this.file){
+  async invokeSelf(file = this.file){
+    if(isString(file)){
+      file = await this.getFileByPath(file);
+    }
     return this.invokePlugin(this.constructor, file);
   }
   
   /**
    * invoke plugin
    */
-  invokePlugin(plugin, file = this.file){
+  async invokePlugin(plugin, file = this.file){
+    if(isString(file)){
+      file = await this.getFileByPath(file);
+    }
     let instance = new PluginInvoke(plugin, file, {
       stc: this.stc,
       options: this.options,
