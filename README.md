@@ -28,7 +28,8 @@ HTML 和 CSS 的 Token 类型，具体见 <https://github.com/welefen/flkit#toke
 
 ### getContent(encoding)
 
-* `encoding` 文件编码，默认为 `null`
+* `encoding` {String | null} 文件编码，默认为 `null`
+* `return` {Promise<String>}
 
 获取文件的内容，如果没有设置 `encoding`，那么获取到的为文件内容对应的 Buffer。
 
@@ -37,6 +38,8 @@ HTML 和 CSS 的 Token 类型，具体见 <https://github.com/welefen/flkit#toke
 设置文件的内容。设置内容时，会清除掉文件已有的 AST。
 
 ### getAst()
+
+* `return` {Promise<Array | Object>}
 
 获取文件内容对应的 AST，对于 HTML 和 CSS，获取到的是 Token 列表。
 
@@ -56,23 +59,41 @@ HTML 和 CSS 的 Token 类型，具体见 <https://github.com/welefen/flkit#toke
 
 ### addFile(file)
 
+* `file` {String | Array}
+
 添加一个文件到资源池中，如：多张小图片合并成一张大图片，需要将大图片添加到资源池中。
 
 ### getFileByPath(filepath)
+
+* `filepath` {String}
+* `return` {Promise<stc-file>}
 
 通过路径获取 stc-file 对象。
 
 ### invokeSelf(file)
 
+* `file` {String | stc-file}
+* `return` {Promise<any>}
+
 对另一个文件执行当前插件。
 
 ### invokePlugin(plugin, file)
+
+* `plugin` {Class}
+* `file` {String | stc-file}
+* `return` {Promise<any>}
 
 调用另一个插件。
 
 ### asyncReplace(content, replace, callback)
 
+* `content` {String}
+* `replace` {RegExp}
+* `callback` {Function}
+* `return` {Promise<String>}
+
 通过正则异步替换内容，如：匹配内容中的地址，然后上传的 CDN，获取新的 URL 替换回去。
+
 
 ### fatal(message, line, column, file = this.file)
 
