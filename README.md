@@ -94,6 +94,13 @@ HTML 和 CSS 的 Token 类型，具体见 <https://github.com/welefen/flkit#toke
 
 通过正则异步替换内容，如：匹配内容中的地址，然后上传的 CDN，获取新的 URL 替换回去。
 
+### cache(name, value)
+
+* `name` {String}
+* `value` {any}
+* `return` {Promise<any>}
+
+设置或者获取缓存。
 
 ### fatal(message, line, column, file = this.file)
 
