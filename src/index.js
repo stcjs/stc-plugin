@@ -24,7 +24,7 @@ export default class StcPlugin {
     if(isMaster){
       return this.file.getContent(encoding);
     }
-    return this.stc.cluster.invoke({
+    return this.stc.cluster.workerInvoke({
       method: 'getContent',
       args: [encoding],
       file: this.file.path,
@@ -53,7 +53,7 @@ export default class StcPlugin {
       }
       let content = await this.getContent('utf8');
       //get ast in worker parsed
-      let ret = await this.stc.cluster.doTask({
+      let ret = await this.stc.cluster.masterInvoke({
         type: 'getAst',
         content,
         file: this.file.path
@@ -63,7 +63,7 @@ export default class StcPlugin {
     }
     
     //get ast from master
-    return this.stc.cluster.invoke({
+    return this.stc.cluster.workerInvoke({
       method: 'getAst',
       file: this.file.path,
       options: this.options
@@ -144,7 +144,7 @@ export default class StcPlugin {
       let file = this.stc.resource.getFileByPath(filepath, this.file.path);
       return Promise.resolve(file);
     }
-    return this.stc.getFileInWorker(filepath);
+    return this.stc.getFileByPath(filepath);
   }
   
   /**
