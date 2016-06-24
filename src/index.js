@@ -1,4 +1,4 @@
-import {asyncReplace, isArray, isString} from 'stc-helper';
+import {asyncReplace, isArray, isString, md5} from 'stc-helper';
 import {isMaster} from 'cluster';
 import PluginInvoke from 'stc-plugin-invoke';
 import path from 'path';
@@ -16,6 +16,29 @@ export default class StcPlugin {
     this.TokenType = this.stc.TokenType;
     //can not use ext in sub plugins
     this.ext = opts.ext || {};
+    //store other properties
+    this._prop = {};
+  }
+  /**
+   * get or set properties
+   */
+  prop(name, value){
+    if(value === undefined){
+      return this._prop[name];
+    }
+    this._prop[name] = value;
+    return this;
+  }
+  /**
+   * get md5 value of plugin
+   */
+  getMd5(){
+    if(this.prop('md5')){
+      return this.prop('md5');
+    }
+    let value = md5(this.constructor.toString());
+    this.prop('md5', value);
+    return value;
   }
   /**
    * get file content
@@ -179,7 +202,32 @@ export default class StcPlugin {
   asyncReplace(content = '', replace, callback){
     return asyncReplace(content, replace, callback);
   }
-
+  /**
+   * get or set cache
+   */
+  async cache(name, value){
+    if(isMaster){
+      let md5Value = this.getMd5();
+      if(!this.stc.cacheInstances[md5Value]){
+        this.stc.cacheInstances[md5Value] = new this.stc.cache({
+          onlyMemory: true
+        })
+      }
+      let instance = this.stc.cacheInstances[md5Value];
+      if(value === undefined){
+        return instance.get(name);
+      }
+      instance.set(name, value);
+      return this;
+    }
+    //get or set cache from master
+    return this.stc.cluster.workerInvoke({
+      method: 'cache',
+      key: this.getMd5(),
+      name,
+      value
+    });
+  }
   /**
    * throw fatal error
    */
