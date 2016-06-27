@@ -102,6 +102,16 @@ HTML 和 CSS 的 Token 类型，具体见 <https://github.com/welefen/flkit#toke
 
 设置或者获取缓存。
 
+
+### createToken(type, value, referToken)
+
+* `type` {String} TokenType
+* `value` {String} Token Value
+* `referToken` {Object} 关联 Token，如果有的话会从这个 Token 读取一些相关信息
+* `return` {Object}
+
+创建一个 Token。
+
 ### fatal(message, line, column, file = this.file)
 
 抛出一个 fatal 错误。
