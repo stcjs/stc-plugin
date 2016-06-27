@@ -150,7 +150,7 @@ export default class StcPlugin {
    */
   getResolvePath(filepath){
     // parse filepath, remove query & hash in filepath
-    filepath = url.parse(filepath).pathname;
+    filepath = decodeURIComponent(url.parse(filepath).pathname);
     let currentFilePath = path.dirname(this.file.path);
     let resolvePath = path.resolve(currentFilePath, filepath);
     let currentPath = process.cwd() + path.sep;
