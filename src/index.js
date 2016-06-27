@@ -15,7 +15,7 @@ export default class StcPlugin {
     this.file = file;
     this.options = opts.options || {};
     this.stc = opts.stc;
-    this.TokenType = this.stc.TokenType;
+    this.TokenType = this.stc.flkit.TokenType;
     //can not use ext in sub plugins
     this.ext = opts.ext || {};
     //store other properties
@@ -231,6 +231,12 @@ export default class StcPlugin {
       name,
       value
     });
+  }
+  /**
+   * create token
+   */
+  createToken(type, value, referToken){
+    return this.stc.flkit.createToken(type, value, referToken);
   }
   /**
    * throw fatal error
