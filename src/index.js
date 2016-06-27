@@ -2,6 +2,8 @@ import {asyncReplace, isArray, isString, md5} from 'stc-helper';
 import {isMaster} from 'cluster';
 import PluginInvoke from 'stc-plugin-invoke';
 import path from 'path';
+import url from 'url';
+
 /**
  * stc plugin abstract class
  */
@@ -147,6 +149,8 @@ export default class StcPlugin {
    * get resolve path
    */
   getResolvePath(filepath){
+    // parse filepath, remove query & hash in filepath
+    filepath = url.parse(filepath).pathname;
     let currentFilePath = path.dirname(this.file.path);
     let resolvePath = path.resolve(currentFilePath, filepath);
     let currentPath = process.cwd() + path.sep;
