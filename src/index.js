@@ -4,6 +4,7 @@ import PluginInvoke from 'stc-plugin-invoke';
 import path from 'path';
 import url from 'url';
 
+
 /**
  * stc plugin abstract class
  */
@@ -15,6 +16,7 @@ export default class StcPlugin {
     this.file = file;
     this.options = opts.options || {};
     this.stc = opts.stc;
+    this.config = this.stc.config;
     this.TokenType = this.stc.flkit.TokenType;
     //can not use ext in sub plugins
     this.ext = opts.ext || {};
@@ -52,8 +54,7 @@ export default class StcPlugin {
     return this.stc.cluster.workerInvoke({
       method: 'getContent',
       args: [encoding],
-      file: this.file.path,
-      options: this.options
+      file: this.file.path
     });
   }
   /**
@@ -90,8 +91,7 @@ export default class StcPlugin {
     //get ast from master
     return this.stc.cluster.workerInvoke({
       method: 'getAst',
-      file: this.file.path,
-      options: this.options
+      file: this.file.path
     });
   }
   /**
@@ -134,17 +134,32 @@ export default class StcPlugin {
   getDependence(file = this.file){
     return file.dependence.get();
   }
+
   /**
    * add file
    */
-  addFile(filepath, content){
-    if(!isMaster){
-      throw new Error('addFile must be invoked in master');
-    }
+  async addFile(filepath, content){
     let resolvePath = this.getResolvePath(filepath);
-    return this.stc.resource.addFile(resolvePath, content);
+    if(resolvePath[0] === '/'){
+      resolvePath = resolvePath.slice(1);
+    }
+    if(isMaster){
+      return this.stc.resource.addFile(resolvePath, content);
+    }
+    await this.stc.cluster.workerInvoke({
+      method: 'addFile',
+      file: resolvePath,
+      content
+    });
+    return this.stc.resource.createFile(resolvePath, content);
   }
-  
+
+  /**
+   * add virtual file
+   */
+  addVirtualFile(filepath, content){
+
+  }
   /**
    * get resolve path
    */
@@ -168,10 +183,9 @@ export default class StcPlugin {
       filepath = filepath.slice(1);
     }
     if(isMaster){
-      let file = this.stc.resource.getFileByPath(filepath, this.file.path);
-      return Promise.resolve(file);
+      return this.stc.resource.getFileByPath(filepath);
     }
-    return this.stc.getFileByPath(filepath);
+    return this.stc.resource.createFile(filepath);
   }
   
   /**
@@ -194,7 +208,7 @@ export default class StcPlugin {
     let instance = new PluginInvoke(plugin, file, {
       stc: this.stc,
       options: this.options,
-      ext: this.ext
+      ext: plugin === this.constructor ? this.ext : {}
     });
     return instance.run();
   }
