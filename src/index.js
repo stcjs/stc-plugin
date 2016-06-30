@@ -138,27 +138,25 @@ export default class StcPlugin {
   /**
    * add file
    */
-  async addFile(filepath, content){
+  async addFile(filepath, content, virtual){
     let resolvePath = this.getResolvePath(filepath);
     if(resolvePath[0] === '/'){
       resolvePath = resolvePath.slice(1);
     }
+    if(content === true){
+      virtual = true;
+      content = undefined;
+    }
     if(isMaster){
-      return this.stc.resource.addFile(resolvePath, content);
+      return this.stc.resource.addFile(resolvePath, content, virtual);
     }
     await this.stc.cluster.workerInvoke({
       method: 'addFile',
       file: resolvePath,
+      virtual,
       content
     });
     return this.stc.resource.createFile(resolvePath, content);
-  }
-
-  /**
-   * add virtual file
-   */
-  addVirtualFile(filepath, content){
-
   }
   /**
    * get resolve path
