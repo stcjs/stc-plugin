@@ -106,7 +106,7 @@ export default class StcPlugin {
         }
       }
       if(clusterOpt === false){
-        let data = this.file.getAst();
+        let data = await this.file.getAst();
         if(astCacheInstance){
           await astCacheInstance.set(cacheKey, data);
         }
