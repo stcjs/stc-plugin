@@ -6,6 +6,21 @@ import url from 'url';
 
 
 /**
+ * get ast cache instance
+ */
+const getAstCacheInstance = (stc, extname) => {
+  let astCacheKey = '__ast__';
+  let astCacheInstance = stc.cacheInstances[astCacheKey];
+  if(!astCacheInstance){
+    astCacheInstance = new stc.cache({
+      type: (stc.config.product || 'default') + '/ast/' + extname
+    });
+    stc.cacheInstances[astCacheKey] = astCacheInstance;
+  }
+  return astCacheInstance;
+}
+
+/**
  * stc plugin abstract class
  */
 export default class StcPlugin {
@@ -74,20 +89,42 @@ export default class StcPlugin {
     
     if(isMaster){
       let clusterOpt = this.stc.config.cluster;
-      if(this.file.hasAst() || clusterOpt === false){
+      if(this.file.hasAst()){
         return this.file.getAst();
       }
       let content = await this.getContent('utf8');
+      let astCacheInstance = null, cacheKey = '';
+      if(this.stc.config.cache !== false){
+        astCacheInstance = getAstCacheInstance(this.stc, this.file.extname);
+        cacheKey = md5(content);
+        let cacheData = await astCacheInstance.get(cacheKey);
+        if(cacheData){
+          let debug = this.stc.debug('cache');
+          debug('getAst from cache, file is `' + this.file.path + '`');
+          this.file.setAst(cacheData);
+          return cacheData;
+        }
+      }
+      if(clusterOpt === false){
+        let data = this.file.getAst();
+        if(astCacheInstance){
+          await astCacheInstance.set(cacheKey, data);
+        }
+        return data;
+      }
       //get ast in worker parsed
       let ret = await this.stc.cluster.masterInvoke({
         type: 'getAst',
         content,
         file: this.file.path
       });
+      if(astCacheInstance){
+        await astCacheInstance.set(cacheKey, ret); 
+      }
       this.file.setAst(ret);
       return ret;
     }
-    
+
     //get ast from master
     return this.stc.cluster.workerInvoke({
       method: 'getAst',
