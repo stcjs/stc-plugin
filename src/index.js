@@ -198,13 +198,6 @@ export default class StcPlugin {
    */
   async addFile(filepath, content, virtual){
     let resolvePath = this.getResolvePath(filepath);
-    if(resolvePath[0] === '/'){
-      resolvePath = resolvePath.slice(1);
-    }
-    if(content === true){
-      virtual = true;
-      content = undefined;
-    }
     if(isMaster){
       return this.stc.resource.addFile(resolvePath, content, virtual);
     }
@@ -214,7 +207,7 @@ export default class StcPlugin {
       virtual,
       content
     });
-    return this.stc.resource.createFile(resolvePath, content);
+    return this.stc.resource.createFile(resolvePath, content, virtual);
   }
   /**
    * get resolve path
@@ -235,9 +228,6 @@ export default class StcPlugin {
    */
   getFileByPath(filepath){
     filepath = this.getResolvePath(filepath);
-    if(filepath[0] === '/'){
-      filepath = filepath.slice(1);
-    }
     if(isMaster){
       return this.stc.resource.getFileByPath(filepath, this.file.path);
     }
