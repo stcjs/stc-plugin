@@ -86,14 +86,17 @@ export default class StcPlugin {
    * get file ast
    */
   async getAst(){
-    
     if(isMaster){
-      let clusterOpt = this.stc.config.cluster;
+      
       if(this.file.hasAst()){
         return this.file.getAst();
       }
+      
+      let clusterOpt = this.stc.config.cluster;
       let content = await this.getContent('utf8');
       let astCacheInstance = null, cacheKey = '';
+
+      // get ast from cache
       if(this.stc.config.cache !== false){
         astCacheInstance = getAstCacheInstance(this.stc, this.file.extname);
         cacheKey = md5(content);
@@ -105,6 +108,7 @@ export default class StcPlugin {
           return cacheData;
         }
       }
+      // turn off cluster
       if(clusterOpt === false){
         let data = await this.file.getAst();
         if(astCacheInstance){
@@ -112,12 +116,14 @@ export default class StcPlugin {
         }
         return data;
       }
+      
       //get ast in worker parsed
       let ret = await this.stc.cluster.masterInvoke({
         type: 'getAst',
         content,
         file: this.file.path
       });
+      
       if(astCacheInstance){
         await astCacheInstance.set(cacheKey, ret); 
       }
@@ -125,7 +131,8 @@ export default class StcPlugin {
       return ret;
     }
 
-    //get ast from master
+    // get AST in worker
+    // must be transform from master
     return this.stc.cluster.workerInvoke({
       method: 'getAst',
       file: this.file.path
