@@ -239,7 +239,7 @@ export default class StcPlugin {
       filepath = filepath.slice(1);
     }
     if(isMaster){
-      return this.stc.resource.getFileByPath(filepath);
+      return this.stc.resource.getFileByPath(filepath, this.file.path);
     }
     return this.stc.resource.createFile(filepath);
   }
@@ -249,7 +249,7 @@ export default class StcPlugin {
    */
   async invokeSelf(file = this.file){
     if(isString(file)){
-      file = await this.getFileByPath(file);
+      file = this.getFileByPath(file);
     }
     return this.invokePlugin(this.constructor, file);
   }
@@ -259,7 +259,7 @@ export default class StcPlugin {
    */
   async invokePlugin(plugin, file = this.file){
     if(isString(file)){
-      file = await this.getFileByPath(file);
+      file = this.getFileByPath(file);
     }
     let instance = new PluginInvoke(plugin, file, {
       stc: this.stc,
