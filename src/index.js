@@ -18,7 +18,31 @@ const getAstCacheInstance = (stc, extname) => {
     stc.cacheInstances[astCacheKey] = astCacheInstance;
   }
   return astCacheInstance;
-}
+};
+
+/**
+ * get file ast
+ */
+const getAst = async (instance, content, fn) => {
+  let astCacheInstance = null, cacheKey = '';
+  // get ast from cache
+  if(instance.stc.config.cache !== false){
+    astCacheInstance = getAstCacheInstance(instance.stc, instance.file.extname);
+    cacheKey = md5(content);
+    let cacheData = await astCacheInstance.get(cacheKey);
+    if(cacheData){
+      let debug = instance.stc.debug('cache');
+      debug('getAst from cache, file is `' + instance.file.path + '`');
+      instance.file.setAst(cacheData);
+      return cacheData;
+    }
+  }
+  let ast = await fn();
+  if(astCacheInstance){
+    await astCacheInstance.set(cacheKey, ast);
+  }
+  return ast;
+};
 
 /**
  * stc plugin abstract class
@@ -86,56 +110,46 @@ export default class StcPlugin {
    * get file ast
    */
   async getAst(){
+    let content = await this.getContent('utf8');
+
     if(isMaster){
-      
       if(this.file.hasAst()){
         return this.file.getAst();
       }
-      
-      let clusterOpt = this.stc.config.cluster;
-      let content = await this.getContent('utf8');
-      let astCacheInstance = null, cacheKey = '';
-
-      // get ast from cache
-      if(this.stc.config.cache !== false){
-        astCacheInstance = getAstCacheInstance(this.stc, this.file.extname);
-        cacheKey = md5(content);
-        let cacheData = await astCacheInstance.get(cacheKey);
-        if(cacheData){
-          let debug = this.stc.debug('cache');
-          debug('getAst from cache, file is `' + this.file.path + '`');
-          this.file.setAst(cacheData);
-          return cacheData;
+      return getAst(this, content, async () => {
+        // turn off cluster
+        if(this.config.cluster === false){
+          return this.file.getAst();
         }
-      }
-      // turn off cluster
-      if(clusterOpt === false){
-        let data = await this.file.getAst();
-        if(astCacheInstance){
-          await astCacheInstance.set(cacheKey, data);
-        }
-        return data;
-      }
-      
-      //get ast in worker parsed
-      let ret = await this.stc.cluster.masterInvoke({
-        type: 'getAst',
-        content,
-        file: this.file.path
+        //get ast in worker parsed
+        let ret = await this.stc.cluster.masterInvoke({
+          type: 'getAst',
+          content,
+          file: this.file.path
+        });
+        this.file.setAst(ret);
+        return ret;
       });
-      
-      if(astCacheInstance){
-        await astCacheInstance.set(cacheKey, ret); 
-      }
-      this.file.setAst(ret);
-      return ret;
     }
 
-    // get AST in worker
-    // must be transform from master
-    return this.stc.cluster.workerInvoke({
-      method: 'getAst',
-      file: this.file.path
+    return getAst(this, content, async () => {
+      // if have ast in master, return directory
+      let ast = await this.stc.cluster.workerInvoke({
+        method: 'getAst',
+        file: this.file.path
+      });
+      if(ast){
+        return ast;
+      }
+      this.file.setContent(content);
+      let ret = await this.file.getAst();
+      // update ast in master
+      await this.stc.cluster.workerInvoke({
+        method: 'updateAst',
+        file: this.file.path,
+        ast: ret
+      });
+      return ret;
     });
   }
   /**
@@ -271,7 +285,7 @@ export default class StcPlugin {
       if(!this.stc.cacheInstances[md5Value]){
         this.stc.cacheInstances[md5Value] = new this.stc.cache({
           onlyMemory: true
-        })
+        });
       }
       let instance = this.stc.cacheInstances[md5Value];
       if(value === undefined){
