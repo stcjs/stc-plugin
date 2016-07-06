@@ -177,7 +177,7 @@ export default class StcPlugin {
         return item;
       }
       let filepath = this.getResolvePath(item);
-      let file = this.stc.resource.lookFile(filepath, this.file.path);
+      let file = this.stc.resource.getFileByPath(filepath, this.file.path);
       if(!file){
         throw new Error(`file ${item} is not exist in ${this.file.path}`);
       }
