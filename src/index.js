@@ -323,8 +323,8 @@ export default class StcPlugin {
     let error = new Error(message);
     error.className = this.constructor.name;
     error.file = file;
-    error.line = line + 1;
-    error.column = column + 1;
+    error.line = line;
+    error.column = column;
     throw error;
   }
 
@@ -334,8 +334,8 @@ export default class StcPlugin {
   error(message, line, column, file = this.file.path){
     this.stc.log.error({
       message,
-      line: line + 1,
-      column: column + 1,
+      line: line,
+      column: column,
       file,
       className: this.constructor.name
     });
@@ -347,8 +347,8 @@ export default class StcPlugin {
   warning(message, line, column, file = this.file.path){
     this.stc.log.warning({
       message,
-      line: line + 1,
-      column: column + 1,
+      line: line,
+      column: column,
       file,
       className: this.constructor.name
     });
@@ -360,8 +360,8 @@ export default class StcPlugin {
   notice(message, line, column, file = this.file.path){
     this.stc.log.notice({
       message,
-      line: line + 1,
-      column: column + 1,
+      line: line,
+      column: column,
       file,
       className: this.constructor.name
     });
