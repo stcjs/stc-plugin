@@ -21,6 +21,23 @@ const getAstCacheInstance = (stc, extname) => {
 };
 
 /**
+ * check run method is execute
+ */
+const checkRunIsExecute = (instance, method) => {
+  if(!instance.prop('__isRun__')){
+    throw new Error(`${method} only allow invoked in update method`);
+  } 
+}
+/**
+ * check in master
+ */
+const checkInMaster = method => {
+  if(!isMaster){
+    throw new Error(`${method} method must be invoked in master`);
+  }
+}
+
+/**
  * get file ast
  */
 const getAst = async (instance, content, fn) => {
@@ -100,9 +117,8 @@ export default class StcPlugin {
    * set file content
    */
   setContent(content){
-    if(!isMaster){
-      throw new Error('setContent method must be invoked in master');
-    }
+    checkInMaster('setContent');
+    checkRunIsExecute(this, 'setContent');
     this.file.setContent(content);
     return this;
   }
@@ -156,9 +172,8 @@ export default class StcPlugin {
    * set ast
    */
   setAst(ast){
-    if(!isMaster){
-      throw new Error('setAst must be invoked in master');
-    }
+    checkInMaster('setAst');
+    checkRunIsExecute(this, 'setAst');
     this.file.setAst(ast);
     return this;
   }
@@ -197,6 +212,9 @@ export default class StcPlugin {
    * add file
    */
   async addFile(filepath, content, virtual){
+    if(!virtual){
+      checkRunIsExecute(this, 'addFile');
+    }
     let resolvePath = this.getResolvePath(filepath);
     if(isMaster){
       return this.stc.resource.addFile(resolvePath, content, virtual);
