@@ -3,63 +3,11 @@ import {isMaster} from 'cluster';
 import PluginInvoke from 'stc-plugin-invoke';
 import path from 'path';
 import url from 'url';
-
-
-/**
- * get ast cache instance
- */
-const getAstCacheInstance = (stc, extname) => {
-  let astCacheKey = '__ast__';
-  let astCacheInstance = stc.cacheInstances[astCacheKey];
-  if(!astCacheInstance){
-    astCacheInstance = new stc.cache({
-      type: (stc.config.product || 'default') + '/ast/' + extname
-    });
-    stc.cacheInstances[astCacheKey] = astCacheInstance;
-  }
-  return astCacheInstance;
-};
-
-/**
- * check run method is execute
- */
-const checkRunIsExecute = (instance, method) => {
-  if(!instance.prop('__isRun__')){
-    throw new Error(`${method} only allow invoked in update method`);
-  } 
-}
-/**
- * check in master
- */
-const checkInMaster = method => {
-  if(!isMaster){
-    throw new Error(`${method} method must be invoked in master`);
-  }
-}
-
-/**
- * get file ast
- */
-const getAst = async (instance, content, fn) => {
-  let astCacheInstance = null, cacheKey = '';
-  // get ast from cache
-  if(instance.stc.config.cache !== false){
-    astCacheInstance = getAstCacheInstance(instance.stc, instance.file.extname);
-    cacheKey = md5(content);
-    let cacheData = await astCacheInstance.get(cacheKey);
-    if(cacheData){
-      let debug = instance.stc.debug('cache');
-      debug('getAst from cache, file is `' + instance.file.path + '`');
-      instance.file.setAst(cacheData);
-      return cacheData;
-    }
-  }
-  let ast = await fn();
-  if(astCacheInstance){
-    await astCacheInstance.set(cacheKey, ast);
-  }
-  return ast;
-};
+import {
+  getAst,
+  checkInMaster,
+  checkRunIsExecute
+} from './helper.js';
 
 /**
  * stc plugin abstract class
