@@ -3,11 +3,17 @@ import {isMaster} from 'cluster';
 import PluginInvoke from 'stc-plugin-invoke';
 import path from 'path';
 import url from 'url';
+import ParallelLimit from './parallel_limit.js';
 import {
   getAst,
   checkInMaster,
   checkRunIsExecute
 } from './helper.js';
+
+/**
+ * parallel limit task instances
+ */
+const parallelLimitInstances = {};
 
 /**
  * stc plugin abstract class
@@ -53,6 +59,7 @@ export default class StcPlugin {
    */
   getContent(encoding){
     if(isMaster){
+      console.log('get content from master', this.file.path)
       return this.file.getContent(encoding);
     }
     return this.stc.cluster.workerInvoke({
@@ -263,6 +270,16 @@ export default class StcPlugin {
    */
   createToken(type, value, referToken){
     return this.stc.flkit.createToken(type, value, referToken);
+  }
+  /**
+   * parallel limit task
+   */
+  parallelLimit(fn, ignoreErrorFn, limit, key = this.constructor.name){
+    if(!(key in parallelLimitInstances)){
+      parallelLimitInstances[key] = new ParallelLimit(limit, ignoreErrorFn);
+    }
+    let instance = parallelLimitInstances[key];
+    return instance.run(fn);
   }
   /**
    * throw fatal error
