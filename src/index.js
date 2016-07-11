@@ -59,7 +59,6 @@ export default class StcPlugin {
    */
   getContent(encoding){
     if(isMaster){
-      console.log('get content from master', this.file.path)
       return this.file.getContent(encoding);
     }
     return this.stc.cluster.workerInvoke({
