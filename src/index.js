@@ -44,6 +44,12 @@ export default class StcPlugin {
     return this;
   }
   /**
+   * is template file
+   */
+  isTpl(){
+    return !!this.file.prop('tpl');
+  }
+  /**
    * get md5 value of plugin
    */
   getMd5(){
