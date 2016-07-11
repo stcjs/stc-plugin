@@ -57,15 +57,19 @@ export default class StcPlugin {
   /**
    * get file content
    */
-  getContent(encoding){
+  async getContent(encoding = null){
     if(isMaster){
       return this.file.getContent(encoding);
     }
-    return this.stc.cluster.workerInvoke({
+    let content = await this.stc.cluster.workerInvoke({
       method: 'getContent',
-      args: [encoding],
+      encoding: encoding,
       file: this.file.path
     });
+    if(encoding !== null){
+      return content;
+    }
+    return new Buffer(content, 'base64');
   }
   /**
    * set file content
