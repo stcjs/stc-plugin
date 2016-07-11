@@ -105,7 +105,7 @@ export default class StcPlugin {
     return getAst(this, content, async () => {
       // if have ast in master, return directory
       let ast = await this.stc.cluster.workerInvoke({
-        method: 'getAst',
+        method: 'getAstIfExist',
         file: this.file.path
       });
       if(ast){
