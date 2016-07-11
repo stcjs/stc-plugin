@@ -284,12 +284,14 @@ export default class StcPlugin {
    * throw fatal error
    */
   fatal(message, line, column, file = this.file.path){
-    let error = new Error(message);
-    error.className = this.constructor.name;
-    error.file = file;
-    error.line = line;
-    error.column = column;
-    throw error;
+    let msg = {
+      message,
+      className: this.constructor.name,
+      file,
+      line,
+      column
+    }
+    throw new Error(JSON.stringify(msg));
   }
 
   /**
