@@ -28,8 +28,10 @@ export default class StcPlugin {
     this.stc = opts.stc;
     this.config = this.stc.config;
     this.TokenType = this.stc.flkit.TokenType;
+    this.include = opts.include;
+    this.matches = this.stc.resource.match(this.file, opts.include);
     //can not use ext in sub plugins
-    this.ext = opts.ext || {};
+    this._ext = opts.ext || {};
     //store other properties
     this._prop = {};
   }
@@ -236,7 +238,7 @@ export default class StcPlugin {
     let instance = new PluginInvoke(plugin, file, {
       stc: this.stc,
       options: this.options,
-      ext: plugin === this.constructor ? this.ext : {}
+      ext: plugin === this.constructor ? this._ext : {}
     });
     return instance.run();
   }
