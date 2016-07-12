@@ -1,8 +1,8 @@
 import {defer} from 'stc-helper';
 /**
- * parallel task dynamic limit
+ * concurrent task dynamic limit
  */
-export default class ParallelTaskLimit {
+export default class ConcurrentTaskLimit {
   /**
    * contructor
    */

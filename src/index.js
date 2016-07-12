@@ -3,7 +3,7 @@ import {isMaster} from 'cluster';
 import PluginInvoke from 'stc-plugin-invoke';
 import path from 'path';
 import url from 'url';
-import ParallelLimit from './parallel_limit.js';
+import ConcurrentLimit from './concurrent_limit.js';
 import {
   getAst,
   checkInMaster,
@@ -11,9 +11,9 @@ import {
 } from './helper.js';
 
 /**
- * parallel limit task instances
+ * concurrent limit task instances
  */
-const parallelLimitInstances = {};
+const concurrentLimitInstances = {};
 
 /**
  * stc plugin abstract class
@@ -281,13 +281,13 @@ export default class StcPlugin {
     return this.stc.flkit.createToken(type, value, referToken);
   }
   /**
-   * parallel limit task
+   * concurrent limit task
    */
-  parallelLimit(fn, ignoreErrorFn, limit, key = this.constructor.name){
-    if(!(key in parallelLimitInstances)){
-      parallelLimitInstances[key] = new ParallelLimit(limit, ignoreErrorFn);
+  concurrentLimit(fn, ignoreErrorFn, limit, key = this.constructor.name){
+    if(!(key in concurrentLimitInstances)){
+     concurrentLimitInstances[key] = new ConcurrentLimit(limit, ignoreErrorFn);
     }
-    let instance = parallelLimitInstances[key];
+    let instance = concurrentLimitInstances[key];
     return instance.run(fn);
   }
   /**
