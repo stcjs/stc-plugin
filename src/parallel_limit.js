@@ -16,6 +16,7 @@ export default class ParallelTaskLimit {
     this.doing = 0;
     this.index = 0;
     this.deferreds = [];
+    this.hasDecrement = false;
   }
   /**
    * is ignore error
@@ -30,12 +31,15 @@ export default class ParallelTaskLimit {
    * next 
    */
   next(flag, item){
-    if(flag !== undefined){
-      this.limit += flag ? 1 : -1;
+    if(flag === false){
+      this.limit--;
+    }else if(flag === true && !this.hasDecrement){
+      this.limit++;
     }
     this.doing--;
     if(flag === false){
       this.deferreds.push(item); 
+      this.hasDecrement = true;
     }
     if(flag){
       this._runTask();
