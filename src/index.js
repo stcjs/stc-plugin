@@ -29,11 +29,16 @@ export default class StcPlugin {
     this.config = this.stc.config;
     this.TokenType = this.stc.flkit.TokenType;
     this.include = opts.include;
-    this.matches = this.stc.resource.match(this.file, opts.include);
     //can not use ext in sub plugins
     this._ext = opts.ext || {};
     //store other properties
     this._prop = {};
+  }
+  /**
+   * get matches
+   */
+  get matches(){
+    return this.stc.resource.match(this.file, this.include);
   }
   /**
    * get or set properties
