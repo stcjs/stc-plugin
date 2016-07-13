@@ -57,13 +57,13 @@ export default class StcPlugin {
     return !!this.file.prop('tpl');
   }
   /**
-   * get md5 value of plugin
+   * get md5 value of plugin & options
    */
   getMd5(){
     if(this.prop('md5')){
       return this.prop('md5');
     }
-    let value = md5(this.constructor.toString());
+    let value = md5(this.constructor.toString() + JSON.stringify(this.options));
     this.prop('md5', value);
     return value;
   }
