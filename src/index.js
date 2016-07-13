@@ -315,6 +315,7 @@ export default class StcPlugin {
    * show error log
    */
   error(message, line, column, file = this.file.path){
+    checkRunIsExecute(this, 'error');
     this.stc.log.error({
       message,
       line: line,
@@ -328,6 +329,7 @@ export default class StcPlugin {
    * show warning log
    */
   warning(message, line, column, file = this.file.path){
+    checkRunIsExecute(this, 'warning')
     this.stc.log.warning({
       message,
       line: line,
@@ -341,6 +343,7 @@ export default class StcPlugin {
    * show notice log
    */
   notice(message, line, column, file = this.file.path){
+    checkRunIsExecute(this, 'notice');
     this.stc.log.notice({
       message,
       line: line,
