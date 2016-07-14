@@ -245,7 +245,16 @@ export default class StcPlugin {
       options: this.options,
       ext: plugin === this.constructor ? this._ext : {}
     });
-    return instance.run();
+    if(isMaster){
+      return instance.run();
+    }
+    let data = await instance.run();
+    await this.stc.cluster.workerInvoke({
+      method: 'update',
+      file: this.file.path,
+      data
+    });
+    return data;
   }
   
   /**
@@ -313,7 +322,7 @@ export default class StcPlugin {
       file,
       line,
       column
-    }
+    };
     throw new Error(JSON.stringify(msg));
   }
 
@@ -335,7 +344,7 @@ export default class StcPlugin {
    * show warning log
    */
   warning(message, line, column, file = this.file.path){
-    checkRunIsExecute(this, 'warning')
+    checkRunIsExecute(this, 'warning');
     this.stc.log.warning({
       message,
       line: line,
