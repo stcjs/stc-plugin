@@ -288,6 +288,12 @@ export default class StcPlugin {
     return this.stc.flkit.createToken(type, value, referToken);
   }
   /**
+   * create raw token in html
+   */
+  createRawToken(type, value, referToken){
+    return this.stc.flkit.createRawToken(type, value, referToken);
+  }
+  /**
    * concurrent limit task
    */
   concurrentLimit(fn, ignoreErrorFn, limit, key = this.constructor.name){
