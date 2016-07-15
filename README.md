@@ -126,7 +126,7 @@ export default class xxxPlugin extends Plugin {
 * `file` {String | stc-file}
 * `return` {Promise<any>}
 
-对另一个文件执行当前插件。
+对另一个文件执行当前插件。返回结果为该插件 `run` 方法的返回值。
 
 ```js
 export default class xxxPlugin extends Plugin {
@@ -142,7 +142,7 @@ export default class xxxPlugin extends Plugin {
 * `file` {String | stc-file}
 * `return` {Promise<any>}
 
-调用另一个插件。
+调用另一个插件。返回结果为调用插件 `run` 方法的返回值。
 
 ```js
 import yyyPlugin from 'stc-yyy';
