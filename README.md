@@ -216,28 +216,42 @@ this.concurrentLimit(() => {
 
 ### createToken(type, value, referToken)
 
-* `type` {String} TokenType
-* `value` {String} Token Value
-* `referToken` {Object} 关联 Token，如果有的话会从这个 Token 读取一些相关信息
-* `return` {Object}
+创建一个 Token，具体见：https://github.com/stcjs/flkit#createtokentype-value-refertoken
 
-创建一个 Token。
+### createRawToke(type, value, referToken)
+
+创建一个 Raw Token，具体见：https://github.com/stcjs/flkit#createrawtokentype-value-refertoken
 
 ### fatal(message, line, column, file = this.file)
 
-抛出一个 fatal 错误。
+抛出一个 fatal 错误，程序不再往下执行。
+
+```js
+this.fatal('file not exist', 1, 1);
+```
 
 ### error(message, line, column, file = this.file)
 
-输出一条错误信息。
+输出一条错误信息，程序继续执行。
+
+只能在 `update` 方法中调用。
+
+```js
+this.error('src value can not be blank', 1, 2);
+```
 
 ### warning(message, line, column, file = this.file)
 
-输出一条警告信息。
+输出一条警告信息，程序继续执行。
+
+只能在 `update` 方法中调用。
+
 
 ### notice(message, line, column, file = this.file)
 
-输出一条提示信息。
+输出一条提示信息，程序继续执行。
+
+只能在 `update` 方法中调用。
 
 ### run()
 
