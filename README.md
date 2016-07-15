@@ -257,9 +257,19 @@ this.error('src value can not be blank', 1, 2);
 
 执行方法。
 
-### update()
+### update(data)
 
-更新方法。
+更新方法，该方法里只能调用常用的方法，不能调用插件扩展的方法。
+
+该方法的参数值即为 `run` 方法的返回值。
+
+```js
+update(data){
+  this.setAst(data);
+}
+```
+
+
 
 ## 静态方法
 
