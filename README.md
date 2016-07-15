@@ -255,7 +255,7 @@ this.error('src value can not be blank', 1, 2);
 
 ### run()
 
-执行方法。
+执行方法。耗时的任务在 `run` 里执行，然后将结果返回给 `update` 方法更新。
 
 ### update(data)
 
