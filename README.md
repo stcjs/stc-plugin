@@ -186,12 +186,36 @@ export default class xxxPlugin extends Plugin {
 设置或者获取缓存。
 
 ```js
+// 读取缓存
 export default class xxxPlugin extends Plugin {
   async run(){
     let value = await this.cache('cacheKey');
   }
 }
 ```
+
+```js
+// 设置缓存
+export default class xxxPlugin extends Plugin {
+  async run(){
+    let value = await this.cache('cacheKey', 'cacheData');
+  }
+}
+```
+
+插件执行过程中，每个文件之间是并行执行的，如果想让有些缓存在文件之间可以公用，可以通过下面的方式。
+
+```js
+export default class xxxPlugin extends Plugin {
+  async run(){
+    let value = await this.cache('cacheKey', () => {
+      // 这里是返回缓存值的具体逻辑
+      return 'cacheData';
+    });
+  }
+}
+```
+
 
 ### concurrentLimit(fn, ignoreErrorFn, limit, key)
 
