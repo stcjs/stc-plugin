@@ -8,7 +8,8 @@ import {
   checkInMaster,
   checkRunIsExecute,
   getCacheInstance,
-  getConcurrentLimitInstance
+  getConcurrentLimitInstance,
+  getAwaitInstance
 } from './helper.js';
 
 /**
@@ -264,13 +265,48 @@ export default class StcPlugin {
    * get or set cache
    */
   async cache(name, value){
+    let isFn = typeof value === 'function';
     if(isMaster){
       let instance = getCacheInstance(this);
       if(value === undefined){
         return instance.get(name);
       }
+      if(isFn){
+        let ret = await instance.get(name);
+        if(ret !== undefined){
+          return ret;
+        }
+        let awaitInstance = getAwaitInstance(this.getMd5());
+        let ret2 = await awaitInstance.run(name, value);
+        if(ret2 !== undefined){
+          await instance.set(name, ret2);
+        }
+        return ret2;
+      }
       await instance.set(name, value);
       return this;
+    }
+    
+    if(isFn){
+      let ret = await this.stc.cluster.workerInvoke({
+        method: 'cache',
+        key: this.getMd5(),
+        name
+      });
+      if(ret !== undefined){
+        return ret;
+      }
+      let awaitInstance = getAwaitInstance(this.getMd5());
+      let ret2 = await awaitInstance.run(name, value);
+      if(ret2 !== undefined){
+        await this.stc.cluster.workerInvoke({
+          method: 'cache',
+          key: this.getMd5(),
+          name,
+          value: ret2
+        });
+      }
+      return ret2;
     }
     //get or set cache from master
     return this.stc.cluster.workerInvoke({

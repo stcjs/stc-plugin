@@ -1,11 +1,16 @@
 import {isMaster} from 'cluster';
 import {md5} from 'stc-helper';
 import ConcurrentLimit from './concurrent_limit.js';
+import Await from 'stc-await';
 
 /**
  * concurrent limit task instances
  */
 const concurrentLimitInstances = {};
+/**
+ * await instances
+ */
+const awaitInstances = {};
 
 /**
  * get ast cache instance
@@ -84,4 +89,13 @@ export function getConcurrentLimitInstance(limit, ignoreErrorFn, key){
     concurrentLimitInstances[key] = new ConcurrentLimit(limit, ignoreErrorFn);
   }
   return concurrentLimitInstances[key];
+}
+/**
+ * get await instance
+ */
+export function getAwaitInstance(key){
+  if(!(key in awaitInstances)){
+    awaitInstances[key] = new Await();
+  }
+  return awaitInstances[key];
 }
