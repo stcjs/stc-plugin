@@ -14,6 +14,10 @@ import {
  * concurrent limit task instances
  */
 const concurrentLimitInstances = {};
+/**
+ * cache instance
+ */
+const cacheInstances = {};
 
 /**
  * stc plugin abstract class
@@ -270,16 +274,16 @@ export default class StcPlugin {
   async cache(name, value){
     if(isMaster){
       let md5Value = this.getMd5();
-      if(!this.stc.cacheInstances[md5Value]){
-        this.stc.cacheInstances[md5Value] = new this.stc.cache({
+      if(!cacheInstances[md5Value]){
+        cacheInstances[md5Value] = new this.stc.cache({
           onlyMemory: true
         });
       }
-      let instance = this.stc.cacheInstances[md5Value];
+      let instance = cacheInstances[md5Value];
       if(value === undefined){
         return instance.get(name);
       }
-      instance.set(name, value);
+      await instance.set(name, value);
       return this;
     }
     //get or set cache from master
