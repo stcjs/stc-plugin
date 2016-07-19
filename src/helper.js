@@ -1,5 +1,11 @@
 import {isMaster} from 'cluster';
 import {md5} from 'stc-helper';
+import ConcurrentLimit from './concurrent_limit.js';
+
+/**
+ * concurrent limit task instances
+ */
+const concurrentLimitInstances = {};
 
 /**
  * get ast cache instance
@@ -56,4 +62,26 @@ export async function getAst (instance, content, fn) {
     await astCacheInstance.set(cacheKey, ast);
   }
   return ast;
+}
+/**
+ * get cache instance
+ */
+export function getCacheInstance(plugin){
+  let md5Value = plugin.getMd5();
+  if(!plugin.stc.cacheInstances[md5Value]){
+    plugin.stc.cacheInstances[md5Value] = new plugin.stc.cache({
+      onlyMemory: true
+    });
+  }
+  return plugin.stc.cacheInstances[md5Value];
+}
+
+/**
+ * get concurrent limit instance
+ */
+export function getConcurrentLimitInstance(limit, ignoreErrorFn, key){
+  if(!(key in concurrentLimitInstances)){
+    concurrentLimitInstances[key] = new ConcurrentLimit(limit, ignoreErrorFn);
+  }
+  return concurrentLimitInstances[key];
 }

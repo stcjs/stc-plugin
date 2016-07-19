@@ -3,21 +3,13 @@ import {isMaster} from 'cluster';
 import PluginInvoke from 'stc-plugin-invoke';
 import path from 'path';
 import url from 'url';
-import ConcurrentLimit from './concurrent_limit.js';
 import {
   getAst,
   checkInMaster,
-  checkRunIsExecute
+  checkRunIsExecute,
+  getCacheInstance,
+  getConcurrentLimitInstance
 } from './helper.js';
-
-/**
- * concurrent limit task instances
- */
-const concurrentLimitInstances = {};
-/**
- * cache instance
- */
-const cacheInstances = {};
 
 /**
  * stc plugin abstract class
@@ -273,13 +265,7 @@ export default class StcPlugin {
    */
   async cache(name, value){
     if(isMaster){
-      let md5Value = this.getMd5();
-      if(!cacheInstances[md5Value]){
-        cacheInstances[md5Value] = new this.stc.cache({
-          onlyMemory: true
-        });
-      }
-      let instance = cacheInstances[md5Value];
+      let instance = getCacheInstance(this);
       if(value === undefined){
         return instance.get(name);
       }
@@ -310,10 +296,7 @@ export default class StcPlugin {
    * concurrent limit task
    */
   concurrentLimit(fn, ignoreErrorFn, limit, key = this.constructor.name){
-    if(!(key in concurrentLimitInstances)){
-     concurrentLimitInstances[key] = new ConcurrentLimit(limit, ignoreErrorFn);
-    }
-    let instance = concurrentLimitInstances[key];
+    let instance = getConcurrentLimitInstance(limit, ignoreErrorFn, key);
     return instance.run(fn);
   }
   /**
