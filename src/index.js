@@ -180,9 +180,6 @@ export default class StcPlugin {
    * add file
    */
   async addFile(filepath, content, virtual){
-    if(!virtual){
-      checkRunIsExecute(this, 'addFile');
-    }
     let resolvePath = this.getResolvePath(filepath);
     if(isMaster){
       return this.stc.resource.addFile(resolvePath, content, virtual);
@@ -223,17 +220,17 @@ export default class StcPlugin {
   /**
    * invoke self plugin
    */
-  async invokeSelf(file = this.file){
+  async invokeSelf(file = this.file, props){
     if(isString(file)){
       file = this.getFileByPath(file);
     }
-    return this.invokePlugin(this.constructor, file);
+    return this.invokePlugin(this.constructor, file, props);
   }
   
   /**
    * invoke plugin
    */
-  async invokePlugin(plugin, file = this.file){
+  async invokePlugin(plugin, file = this.file, props = {}){
     if(isString(file)){
       file = this.getFileByPath(file);
     }
@@ -242,6 +239,10 @@ export default class StcPlugin {
       options: this.options,
       ext: plugin === this.constructor ? this._ext : {}
     });
+    //set prop for plugin
+    for(let name in props){
+      instance.pluginInstance.prop(name, props[name]);
+    }
     if(isMaster){
       return instance.run();
     }
