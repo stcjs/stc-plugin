@@ -337,6 +337,13 @@ export default class StcPlugin {
     return instance.run(fn);
   }
   /**
+   * await
+   */
+  await(key, fn){
+    let instance = getAwaitInstance(key);
+    return instance.run(fn);
+  }
+  /**
    * throw fatal error
    */
   fatal(message, line, column, file = this.file.path){
