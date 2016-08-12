@@ -1,8 +1,9 @@
-import {asyncReplace, isArray, isString, md5} from 'stc-helper';
+import {asyncReplace, isArray, isString, md5, mkdir, isFile} from 'stc-helper';
 import {isMaster} from 'cluster';
 import PluginInvoke from 'stc-plugin-invoke';
 import path from 'path';
 import url from 'url';
+import fs from 'fs';
 import {
   getAst,
   checkInMaster,
@@ -11,6 +12,8 @@ import {
   getConcurrentLimitInstance,
   getAwaitInstance
 } from './helper.js';
+
+const homePath = process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'];
 
 /**
  * stc plugin abstract class
@@ -316,6 +319,21 @@ export default class StcPlugin {
       name,
       value
     });
+  }
+  /**
+   * storage
+   */
+  storage(name, value){
+    let savePath = path.normalize(homePath + '/.stc/storage/' + name + '.json');
+    mkdir(path.dirname(savePath));
+    if(value === undefined){
+      if(isFile(savePath)){
+        let data = fs.readFileSync(savePath, 'utf8');
+        return JSON.parse(data);
+      }
+      return;
+    }
+    fs.writeFileSync(savePath, JSON.stringify(value));
   }
   /**
    * create token
