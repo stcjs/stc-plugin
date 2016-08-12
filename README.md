@@ -216,6 +216,13 @@ export default class xxxPlugin extends Plugin {
 }
 ```
 
+### storage(name, value)
+
+* `name` {String} 存储名
+* `value` {any} 存储值
+
+获取或者存储值，存储后一直有效。同步方法。
+
 
 ### concurrentLimit(fn, ignoreErrorFn, limit, key)
 
