@@ -325,7 +325,7 @@ export default class StcPlugin {
    */
   storage(name, value){
     let product = this.config.product || 'default';
-    let savePath = path.normalize(homePath + '/.stc/storage/' + product + '/'+ name + '.json');
+    let savePath = path.normalize(`${homePath}/.stc/storage/${product}/${name}.json`);
     mkdir(path.dirname(savePath));
     if(value === undefined){
       if(isFile(savePath)){
