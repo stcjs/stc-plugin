@@ -53,7 +53,7 @@ export async function getAst (instance, content, fn) {
   // get ast from cache
   if(instance.stc.config.cache !== false){
     astCacheInstance = getAstCacheInstance(instance.stc, instance.file.extname);
-    cacheKey = md5(content);
+    cacheKey = md5(instance.stc.config._tplCacheKey + content);
     let cacheData = await astCacheInstance.get(cacheKey);
     if(cacheData){
       let debug = instance.stc.debug('cache');
