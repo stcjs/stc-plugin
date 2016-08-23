@@ -116,7 +116,7 @@ export default class StcPlugin {
         });
         this.file.setAst(ret);
         return ret;
-      });
+      }, this.file.path);
     }
 
     return getAst(this, content, async () => {

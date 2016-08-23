@@ -48,12 +48,12 @@ export function checkInMaster(method){
 /**
  * get file ast
  */
-export async function getAst (instance, content, fn) {
+export async function getAst (instance, content, fn, filepath) {
   let astCacheInstance = null, cacheKey = '';
   // get ast from cache
   if(instance.stc.config.cache !== false){
     astCacheInstance = getAstCacheInstance(instance.stc, instance.file.extname);
-    cacheKey = md5(instance.stc.config._tplCacheKey + content);
+    cacheKey = md5(instance.stc.config._tplCacheKey + content + filepath);
     let cacheData = await astCacheInstance.get(cacheKey);
     if(cacheData){
       let debug = instance.stc.debug('cache');
