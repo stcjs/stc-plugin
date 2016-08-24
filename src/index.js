@@ -232,7 +232,7 @@ export default class StcPlugin {
   /**
    * invoke self plugin
    */
-  async invokeSelf(file = this.file, props){
+  invokeSelf(file = this.file, props){
     if(isString(file)){
       file = this.getFileByPath(file);
     }
