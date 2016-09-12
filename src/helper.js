@@ -20,6 +20,7 @@ export function getAstCacheInstance(stc, extname){
   let astCacheInstance = stc.cacheInstances[astCacheKey];
   if(!astCacheInstance){
     astCacheInstance = new stc.cache({
+      path: stc.config.cachePath,
       type: (stc.config.product || 'default') + '/ast/' + extname
     });
     stc.cacheInstances[astCacheKey] = astCacheInstance;
@@ -75,6 +76,7 @@ export function getCacheInstance(plugin){
   let md5Value = plugin.getMd5();
   if(!plugin.stc.cacheInstances[md5Value]){
     plugin.stc.cacheInstances[md5Value] = new plugin.stc.cache({
+      path: plugin.config.cachePath,
       onlyMemory: true
     });
   }

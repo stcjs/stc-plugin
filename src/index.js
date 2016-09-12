@@ -13,8 +13,6 @@ import {
   getAwaitInstance
 } from './helper.js';
 
-const homePath = process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'];
-
 /**
  * stc plugin abstract class
  */
@@ -334,7 +332,7 @@ export default class StcPlugin {
    */
   storage(name, value){
     let product = this.config.product || 'default';
-    let savePath = path.normalize(`${homePath}/.stc/storage/${product}/${name}.json`);
+    let savePath = path.normalize(`${this.config.cachePath}/storage/${product}/${name}.json`);
     mkdir(path.dirname(savePath));
     if(value === undefined){
       if(isFile(savePath)){
