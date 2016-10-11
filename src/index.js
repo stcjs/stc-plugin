@@ -1,4 +1,4 @@
-import {asyncReplace, isArray, isString, md5, mkdir, isFile} from 'stc-helper';
+import {asyncReplace, isArray, isString, md5, mkdir, isFile, isRemoteUrl} from 'stc-helper';
 import {isMaster} from 'cluster';
 import PluginInvoke from 'stc-plugin-invoke';
 import path from 'path';
@@ -10,7 +10,8 @@ import {
   checkRunIsExecute,
   getCacheInstance,
   getConcurrentLimitInstance,
-  getAwaitInstance
+  getAwaitInstance,
+  getContentFromUrl
 } from './helper.js';
 
 /**
@@ -361,6 +362,18 @@ export default class StcPlugin {
   concurrentLimit(fn, ignoreErrorFn, limit, key = this.constructor.name){
     let instance = getConcurrentLimitInstance(limit, ignoreErrorFn, key);
     return instance.run(fn);
+  }
+  /**
+   * get content from url
+   */
+  getContentFromUrl(url){
+    if(!isRemoteUrl(url)){
+      throw new Error('url must be start with http:// or https://');
+    }
+    let awaitInstance = getAwaitInstance(this.getMd5());
+    return awaitInstance.run(url, () => {
+      return getContentFromUrl(url);
+    });
   }
   /**
    * await
