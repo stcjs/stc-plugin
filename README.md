@@ -244,6 +244,12 @@ this.concurrentLimit(() => {
 }, 10);
 ```
 
+### getContentFromUrl(url)
+
+* `url` {String} 远程地址
+* `return` {Buffer}
+
+获取远程地址内容。
 
 ### createToken(type, value, referToken)
 
