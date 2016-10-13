@@ -198,6 +198,9 @@ export default class StcPlugin {
    * get resolve path
    */
   getResolvePath(filepath){
+    if(path.isAbsolute(filepath) && isFile(filepath)){
+      return filepath;
+    }
     // parse filepath, remove query & hash in filepath
     filepath = decodeURIComponent(url.parse(filepath).pathname);
     let flag = this.config.include.some(item => {
