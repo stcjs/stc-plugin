@@ -83,6 +83,23 @@ export default class StcPlugin {
     }
     return new Buffer(content, 'base64');
   }
+
+
+  async workerInvoke(method, ...args) {
+    if(isMaster) {
+      throw new Error('workerInvoke must be invoked in worker');
+    }
+    var {type, pluginIndex} = this._ext;
+    let ret = await this.stc.cluster.workerInvoke({
+      method,
+      type,
+      pluginIndex,
+      args,
+      file: this.file.path
+    });
+    return ret;
+  }
+
   /**
    * set file content
    */
@@ -183,6 +200,7 @@ export default class StcPlugin {
    */
   async addFile(filepath, content, virtual){
     let resolvePath = this.getResolvePath(filepath);
+
     if(isMaster){
       return this.stc.resource.addFile(resolvePath, content, virtual);
     }
@@ -198,7 +216,7 @@ export default class StcPlugin {
    * get resolve path
    */
   getResolvePath(filepath){
-    if(path.isAbsolute(filepath) && isFile(filepath)){
+    if(path.isAbsolute(filepath)){
       return filepath;
     }
     // parse filepath, remove query & hash in filepath

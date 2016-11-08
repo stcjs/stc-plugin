@@ -251,6 +251,37 @@ this.concurrentLimit(() => {
 
 获取远程地址内容。
 
+### workerInvoke(method, ...args)
+
+在子进程调用主进程的插件实例方法 method ，并传递 args。
+应用场景是在子进程执行中，涉及一些资源共享的而需要原子化的操作。比如每个子进程需要获取某个字符串的全局唯一 id（hash），可以把如下
+注： args 必须是可以序列化的任意类型，由于进程通讯有性能损耗，所以如果在一次里面需要多次调用 workerInvoke，可以考虑合并调用。
+
+
+```js
+
+var cacheInMaster = [];
+export default class xxxPlugin extends Plugin {
+  async run(){
+    var id;
+    if(isMaster) {
+      id = this.getUniqueId(someFileName);
+    } else {
+      id = await this.workerInvoke('getUniqueId', someFileName);
+    }
+  }
+
+  getUniqueId(someFileName) {
+    var index = cachInMaster.indexOf(someFileName);
+    if(index === -1) {
+      index = cachInMaster.push(someFileName);
+    }
+    return index;
+  }
+}
+```
+
+
 ### createToken(type, value, referToken)
 
 创建一个 Token，具体见：https://github.com/stcjs/flkit#createtokentype-value-refertoken
@@ -317,7 +348,7 @@ update(data){
 ```js
 export default class extends StcPlugin {
   /**
-   * default include 
+   * default include
    */
   static include(){
     return /\.js/;
