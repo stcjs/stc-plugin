@@ -105,7 +105,8 @@ export function getAwaitInstance(key){
 /**
  * get content from url
  */
-export async function getContentFromUrl(url){
+export async function getContentFromUrl(_url){
+  let url = _url.indexOf('//') === 0 ? 'http:' + _url : _url;
   let fn = promisify(request.get, request);
   let result = await fn(url, {
     method: 'get',

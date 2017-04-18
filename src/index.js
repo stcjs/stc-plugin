@@ -83,6 +83,23 @@ export default class StcPlugin {
     }
     return new Buffer(content, 'base64');
   }
+
+
+  async workerInvoke(method, ...args) {
+    if(isMaster) {
+      throw new Error('workerInvoke must be invoked in worker');
+    }
+    var {type, pluginIndex} = this._ext;
+    let ret = await this.stc.cluster.workerInvoke({
+      method,
+      type,
+      pluginIndex,
+      args,
+      file: this.file.path
+    });
+    return ret;
+  }
+
   /**
    * set file content
    */
@@ -183,6 +200,7 @@ export default class StcPlugin {
    */
   async addFile(filepath, content, virtual){
     let resolvePath = this.getResolvePath(filepath);
+
     if(isMaster){
       return this.stc.resource.addFile(resolvePath, content, virtual);
     }
@@ -198,11 +216,11 @@ export default class StcPlugin {
    * get resolve path
    */
   getResolvePath(filepath){
-    if(path.isAbsolute(filepath) && isFile(filepath)){
+    if(path.isAbsolute(filepath)){
       return filepath;
     }
     // parse filepath, remove query & hash in filepath
-    filepath = decodeURIComponent(url.parse(filepath).pathname);
+    filepath = path.normalize(decodeURIComponent(url.parse(filepath).pathname));
     let flag = this.config.include.some(item => {
       if(item[item.length - 1] !== '/'){
         item += '/';
@@ -213,7 +231,11 @@ export default class StcPlugin {
       return filepath;
     }
     let currentFilePath = path.dirname(this.file.path);
-    let resolvePath = path.resolve(currentFilePath, filepath);
+
+    let resolvePath = filepath;
+    if(filepath.indexOf(currentFilePath) !== 0)  {
+      resolvePath = path.resolve(currentFilePath, filepath);
+    }
     let currentPath = process.cwd() + path.sep;
     if(resolvePath.indexOf(currentPath) === 0){
       resolvePath = resolvePath.slice(currentPath.length);
@@ -230,7 +252,7 @@ export default class StcPlugin {
     }
     return this.stc.resource.createFile(filepath);
   }
-  
+
   /**
    * invoke self plugin
    */
@@ -240,7 +262,7 @@ export default class StcPlugin {
     }
     return this.invokePlugin(this.constructor, file, props);
   }
-  
+
   /**
    * invoke plugin
    */
@@ -268,7 +290,7 @@ export default class StcPlugin {
     });
     return data;
   }
-  
+
   /**
    * async content replace
    * must be use RegExp
@@ -301,7 +323,7 @@ export default class StcPlugin {
       await instance.set(name, value);
       return this;
     }
-    
+
     if(isFn){
       let ret = await this.stc.cluster.workerInvoke({
         method: 'cache',
@@ -440,17 +462,17 @@ export default class StcPlugin {
       className: this.constructor.name
     });
   }
-  
+
   /**
    * run
    */
   run(){
-    
+
   }
   /**
    * update
    */
   update(){
-    
+
   }
 }
